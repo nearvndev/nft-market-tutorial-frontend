@@ -59,15 +59,15 @@ function MarketPlace() {
                 className="site-page-header"
                 title="Marketplace"
             />
-            <div>
+            <div style={{ padding: 30, display: "flex" }}>
                 {
                     data.map( item => {
                         return (
                             <Card
                                 key={item.token_id}
                                 hoverable
-                                style={{ width: 240 }}
-                                cover={<img style={{maxHeight: 300, width: "100%", objectFit: "contain"}} alt="nft-cover" src={item.itemData.metadata.media} />}
+                                style={{ width: 240, marginRight: 15, marginBottom: 15 }}
+                                cover={<img style={{height: 300, width: "100%", objectFit: "contain"}} alt="Media NFT" src={item.itemData.metadata.media} />}
                                 actions={[
                                     <Button onClick={() => handleBuy(item)} icon={<ShoppingCartOutlined />}> Buy </Button>
                                 ]}

@@ -140,7 +140,7 @@ function Profile() {
 
                 // Submit sale
                 if (storageAccount > 0) {
-                    console.log("Data: ", storageAccount, utils.format.parseNearAmount("0.1"));
+                    console.log("Data: ", storageAccount, utils.format.parseNearAmount("0.1"), nearConfig.marketContractName);
                     await window.contractNFT.nft_approve({
                         token_id: currentToken.token_id,
                         account_id: nearConfig.marketContractName,
