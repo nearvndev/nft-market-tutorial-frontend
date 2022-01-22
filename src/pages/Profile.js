@@ -1,12 +1,12 @@
 import React, { useEffect, useState} from 'react'
-import {Button, Card, PageHeader} from "antd";
+import {Button, Card, PageHeader, notification} from "antd";
 import {SendOutlined, DollarCircleOutlined, EllipsisOutlined } from "@ant-design/icons";
 import ModalTransferNFT from "../components/ModalTransferNFT";
 import ModalSale from "../components/ModalSale";
 import {default as PublicKey, transactions, utils} from "near-api-js"
 import { functionCall, createTransaction } from "near-api-js/lib/transaction";
 import ModalMintNFT from "../components/ModelMintNFT";
-import {login} from "../utils";
+import {login, parseTokenAmount} from "../utils";
 import BN from "bn.js";
 import {baseDecode} from "borsh";
 import getConfig from '../config'
@@ -129,9 +129,22 @@ function Profile() {
         return window.walletConnection.requestSignTransactions(nearTransactions);
     }
 
-    async function submitOnSale(price) {
+    async function submitOnSale(token, price) {
         try {
             if (price && currentToken.token_id) {
+
+                let sale_conditions = token === "NEAR" ? 
+                        {
+                            is_native: true,
+                            contract_id: "near",
+                            decimals: "24",
+                            amount: utils.format.parseNearAmount(price.toString())
+                        } : {
+                            is_native: false,
+                            contract_id: window.contractFT.contractId,
+                            decimals: "18",
+                            amount: parseTokenAmount(price, 18).toLocaleString('fullwide', {useGrouping:false})
+                        };
 
                 // Check storage balance
                 let storageAccount = await window.contractMarket.storage_balance_of({
@@ -144,13 +157,16 @@ function Profile() {
                     await window.contractNFT.nft_approve({
                         token_id: currentToken.token_id,
                         account_id: nearConfig.marketContractName,
-                        msg: JSON.stringify({
-                            sale_conditions: utils.format.parseNearAmount(price.toString())
-                        })
+                        msg: JSON.stringify({sale_conditions})
                     },
                     30000000000000, utils.format.parseNearAmount("0.01"));
-
                     setSaleVisible(false);
+                } else {
+                    notification["warning"]({
+                        message: 'Không đủ Storage Balance',
+                        description:
+                          'Storage Balance của bạn không đủ để đăng bán NFT mới. Vui lòng nạp thêm tại đây!',
+                      });
                 }
             }
 

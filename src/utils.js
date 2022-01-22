@@ -30,6 +30,11 @@ export async function initContract() {
     viewMethods: ['nft_tokens_for_owner', "nft_token"],
     // Change methods can modify the state. But you don't receive the returned value when called.
     changeMethods: ['nft_mint', "nft_transfer", "nft_approve"],
+  });
+
+  window.contractFT = await new Contract(window.walletConnection.account(), nearConfig.ftContractName, {
+    viewMethods: ['ft_metadata', 'ft_balance_of'],
+    changeMethods: ['ft_transfer_call', 'storage_deposit']
   })
 }
 
@@ -45,4 +50,13 @@ export function login() {
   // This works by creating a new access key for the user's account and storing
   // the private key in localStorage.
   window.walletConnection.requestSignIn(nearConfig.marketContractName)
+}
+
+export function parseTokenWithDecimals(amount, decimals) {
+  let amountD = amount / Math.pow(10, decimals);
+  return Math.floor(amountD * 100 / 100);
+}
+
+export function parseTokenAmount(amount, decimals) {
+  return amount * Math.pow(10, decimals);
 }
